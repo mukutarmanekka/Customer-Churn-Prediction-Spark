@@ -1,9 +1,28 @@
+<div align="center">
+
 # Customer Churn Prediction & Retention Analytics
-## Full Project Report
+
+**A distributed PySpark machine-learning pipeline with a live cluster-monitoring and retention analytics dashboard.**
+
+[![Apache Spark](https://img.shields.io/badge/Apache_Spark-4.1.4-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white)](https://spark.apache.org/)
+[![PySpark](https://img.shields.io/badge/PySpark-4.1.4-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white)](https://spark.apache.org/docs/latest/api/python/)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Hadoop HDFS](https://img.shields.io/badge/Hadoop_HDFS-3.2.1-66CCFF?style=for-the-badge&logo=apachehadoop&logoColor=black)](https://hadoop.apache.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Spark MLlib](https://img.shields.io/badge/Spark-MLlib-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white)](https://spark.apache.org/mllib/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Pandas](https://img.shields.io/badge/Pandas-2.x-150458?style=for-the-badge&logo=pandas&logoColor=white)](https://pandas.pydata.org/)
+[![Plotly](https://img.shields.io/badge/Plotly-Visualization-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)](https://plotly.com/python/)
+
+[![Dataset](https://img.shields.io/badge/Dataset-KKBox%20WSDM%202018-20BEFF?style=flat-square&logo=kaggle&logoColor=white)](https://www.kaggle.com/competitions/kkbox-churn-prediction-challenge/data)
+
+</div>
+
+---
 
 **Domain:** Distributed data engineering, machine learning and retention analytics  
 **Dataset:** KKBox WSDM 2018 Churn Prediction Challenge  
-**Stack:** Apache Spark 4.1.4, PySpark, Spark MLlib, Hadoop HDFS, Docker Compose, Streamlit, Pandas and Plotly
+**Core stack:** Apache Spark 4.1.4, PySpark, Spark MLlib, Hadoop HDFS, Docker Compose, Streamlit, Pandas and Plotly
 
 ## 1. Executive summary
 
@@ -28,7 +47,13 @@ Objectives:
 
 ## 3. System architecture
 
-### 3.1 Logical data and execution flow
+### 3.1 Hybrid cluster architecture
+
+![Excalidraw-style architecture diagram](assets/architecture.jpg)
+
+*The diagram shows the Windows master, local Docker Spark workers, physical Windows/Linux workers, HDFS, the PySpark/Spark MLlib pipeline, and the Streamlit Results and Monitoring dashboard.*
+
+### 3.2 Logical data and execution flow
 
 ```mermaid
 flowchart LR
@@ -67,19 +92,41 @@ The standard master-side Compose stack contains the NameNode, DataNode and Spark
 
 ## 4. Dataset and data scope
 
-The project uses the official KKBox WSDM 2018 churn challenge files:
+The project uses the official **KKBox WSDM 2018 Churn Prediction Challenge** dataset.
 
-| File | Purpose |
-|---|---|
-| train.csv | Subscriber identifiers and official is_churn target |
-| transactions.csv | Payment, subscription plan, renewal and cancellation history |
-| members_v3.csv | Registration, demographic and member attributes |
+<div align="center">
 
-The three required CSV files are stored in data/raw/kkbox/ before upload to HDFS under /kkbox/input/.
+[![Download dataset from Kaggle](https://img.shields.io/badge/Download%20Dataset-Kaggle%20Competition-20BEFF?style=for-the-badge&logo=kaggle&logoColor=white)](https://www.kaggle.com/competitions/kkbox-churn-prediction-challenge/data)
+
+</div>
+
+### Download and prepare the data
+
+1. Create or sign in to your [Kaggle account](https://www.kaggle.com/).
+2. Open the [KKBox Churn Prediction Challenge — Data page](https://www.kaggle.com/competitions/kkbox-churn-prediction-challenge/data).
+3. Read and accept the competition rules if Kaggle prompts you to do so.
+4. Download the competition data archive and extract the following **three required CSV files**:
+   - `train.csv` — subscriber identifiers and the official `is_churn` target.
+   - `transactions.csv` — payment, subscription plan, renewal and cancellation history.
+   - `members_v3.csv` — registration, demographic and member attributes.
+5. Place the extracted files in this exact project directory structure:
+
+```text
+data/
+└── raw/
+    └── kkbox/
+        ├── train.csv
+        ├── transactions.csv
+        └── members_v3.csv
+```
+
+The application setup uploads these files to HDFS under `/kkbox/input/`. **Do not rename the files or place them in a different directory.**
+
+> **Dataset access:** The data is hosted by Kaggle, not by this repository. A Kaggle account and acceptance of the competition rules may be required. The raw dataset is intentionally excluded from Git because of its size and the competition's data-use terms. Do not upload or redistribute the competition files through this repository.
 
 **Feature cutoff:** 2017-02-28. Transaction records after this cutoff are excluded from feature construction.
 
-The current implementation does not aggregate the large listening activity logs (user_logs.csv and user_logs_v2.csv). This is an explicit scope limitation.
+The current implementation does not aggregate the large listening activity logs (`user_logs.csv` and `user_logs_v2.csv`). These files are not required by the current pipeline.
 
 ## 5. Data engineering and feature engineering
 
