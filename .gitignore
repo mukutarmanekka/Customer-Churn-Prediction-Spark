@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+build/
+dist/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# Local datasets and generated data (download separately; do not commit KKBox/Olist files)
+data/raw/
+data/processed/
+data/interim/
+*.zip
+*.7z
+*.parquet
+*.orc
+
+# Runtime artifacts, model outputs, predictions, logs and checkpoints
+artifacts/
+*.log
+*.pid
+*.flag
+*.bak
+*.tmp
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node tooling if used locally
+node_modules/

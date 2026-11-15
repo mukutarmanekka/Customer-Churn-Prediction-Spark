@@ -1,0 +1,55 @@
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: churn-hdfs-namenode
+    restart: unless-stopped
+    environment:
+      CLUSTER_NAME: churn-cluster
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
+      HDFS_CONF_dfs_replication: "1"
+      HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check: "false"
+    ports: ["9870:9870", "9000:9000"]
+    volumes: ["hdfs_namenode:/hadoop/dfs/name", ".:/opt/project"]
+    networks: [data-net]
+    mem_limit: 768m
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: churn-hdfs-datanode
+    hostname: datanode
+    restart: unless-stopped
+    environment:
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
+      HDFS_CONF_dfs_replication: "1"
+      HDFS_CONF_dfs_datanode_data_dir: file:///hadoop/dfs/data
+      HDFS_CONF_dfs_datanode_hostname: "${HDFS_MASTER_HOST:-192.168.137.1}"
+      HDFS_CONF_dfs_datanode_address: "0.0.0.0:9866"
+      SERVICE_PRECONDITION: "namenode:9870"
+    depends_on: [namenode]
+    ports: ["9864:9864", "9866:9866"]
+    volumes: ["hdfs_datanode:/hadoop/dfs/data"]
+    networks: [data-net]
+    mem_limit: 768m
+  spark-master:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.spark
+    image: ecommerce-churn-spark:4.1.4
+    container_name: churn-spark-master
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "spark-master", "--port", "7077", "--webui-port", "8080"]
+    ports: ["7077:7077", "8080:8080", "4040:4040", "44575:44575", "44576:44576"]
+    volumes: [".:/opt/project"]
+    networks: [data-net]
+    mem_limit: 768m
+  spark-worker:
+    image: ecommerce-churn-spark:4.1.4
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077", "--cores", "1", "--memory", "768m"]
+    depends_on: [spark-master]
+    volumes: [".:/opt/project"]
+    networks: [data-net]
+    mem_limit: 1g
+volumes:
+  hdfs_namenode:
+  hdfs_datanode:
+networks:
+  data-net:
+    driver: bridge

@@ -1,0 +1,7 @@
+FROM apache/spark:4.1.4-scala2.13-java17-python3-ubuntu
+
+USER root
+RUN python3 -m pip install --no-cache-dir --timeout 120 --retries 10 numpy==2.2.6 "psutil>=5.9,<8" \
+    && mkdir -p /opt/project/src
+
+USER spark
